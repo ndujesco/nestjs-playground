@@ -1,14 +1,23 @@
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { GoogleOauthGuard } from './guards/google-oauth-guard';
+import { MessageDto } from './message.dto';
 
-@Controller('auth')
+@Controller()
 export class UserController {
   constructor(private authService: UserService) {}
 
-  @Get('/test')
-  async test() {
-    return { accessToken: await this.authService.test() };
+  @Post('/send-message')
+  async message(@Body() messageDto: MessageDto) {
+    return this.authService.sendMessage(messageDto);
   }
 
   @Get('google')

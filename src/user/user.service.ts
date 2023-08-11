@@ -1,12 +1,21 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from './user.repository';
+import { MessageDto } from './message.dto';
+import { ChatGateway } from 'src/gateway/gateway';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly userRepository: UserRepository,
+    @Inject(forwardRef(() => ChatGateway))
+    private chatGateWay: ChatGateway,
   ) {}
 
   generateJwt(payload): string {
@@ -34,11 +43,23 @@ export class UserService {
     // const
   }
 
-  async test() {
-    return this.generateJwt({ id: 1 });
-  }
-
   async registerUser(user) {
     return;
+  }
+
+  async sendMessage(messageDto: MessageDto) {
+    const { senderId, text, receiverId, socketId } = messageDto;
+    const uniquifiedRoomName = `${senderId} ${receiverId}`
+      .split(' ')
+      .sort((a, b) => (a > b ? 1 : -1))
+      .join('-and-');
+
+    this.chatGateWay.server.in(socketId).socketsJoin(uniquifiedRoomName);
+    this.chatGateWay.server
+      .to(uniquifiedRoomName)
+      .except(socketId)
+      .emit('onMessage', { text });
+
+    return { text, uniquifiedRoomName };
   }
 }

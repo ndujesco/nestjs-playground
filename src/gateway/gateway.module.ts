@@ -1,7 +1,10 @@
-import { Module } from '@nestjs/common';
-import { MyGateway } from './gateway';
+import { Module, forwardRef } from '@nestjs/common';
+import { ChatGateway } from './gateway';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
-  providers: [MyGateway],
+  imports: [forwardRef(() => UserModule)],
+  providers: [ChatGateway],
+  // exports: [ChatGateway],
 })
 export class GatewayModule {}
