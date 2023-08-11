@@ -1,9 +1,4 @@
-import {
-  Inject,
-  Injectable,
-  UnauthorizedException,
-  forwardRef,
-} from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -12,10 +7,10 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { body } from 'express-validator';
 import { Server, Socket } from 'socket.io';
 import { MessageDto } from 'src/user/message.dto';
 import { UserService } from 'src/user/user.service';
+import { ServerToClientEvents } from './event.types';
 
 @Injectable()
 @WebSocketGateway()
@@ -23,7 +18,7 @@ export class ChatGateway
   implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
 {
   @WebSocketServer()
-  server: Server;
+  server: Server<any, ServerToClientEvents>;
 
   constructor(
     @Inject(forwardRef(() => UserService)) private userService: UserService,
@@ -37,7 +32,7 @@ export class ChatGateway
       .sort((a, b) => (a > b ? 1 : -1))
       .join('-and-');
 
-    this.server.to(uniquifiedRoomName).emit('onMessage', { message });
+    this.server.to(uniquifiedRoomName).emit('newMessage', { message });
   }
 
   @SubscribeMessage('sample')
@@ -71,7 +66,7 @@ export class ChatGateway
     console.log(`User with id ${socket.id} has disconnected`);
   }
 
-  async afterInit(server: any) {
+  async afterInit(client: Socket) {
     console.log('afterInit');
   }
 }

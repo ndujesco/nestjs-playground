@@ -58,7 +58,7 @@ export class UserService {
     this.chatGateWay.server
       .to(uniquifiedRoomName)
       .except(socketId)
-      .emit('onMessage', { text });
+      .emit('newMessage', { text });
 
     return { text, uniquifiedRoomName };
   }
