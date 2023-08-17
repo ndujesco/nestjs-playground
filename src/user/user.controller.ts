@@ -35,4 +35,9 @@ export class UserController {
     // return { user: req.user };
     // const token = await this.authService.signIn(req.user);
   }
+
+  @Get('generate-jwt')
+  getJwt() {
+    return { acessToken: this.authService.generateJwt({ id: 1 }) };
+  }
 }

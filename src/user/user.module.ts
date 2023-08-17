@@ -15,7 +15,7 @@ import { ChatGateway } from 'src/gateway/gateway';
         expiresIn: '100d',
       },
     }),
-    forwardRef(() => GatewayModule),
+    GatewayModule,
   ],
   controllers: [UserController],
   providers: [
@@ -25,6 +25,5 @@ import { ChatGateway } from 'src/gateway/gateway';
     ChatGateway,
     JwtService,
   ],
-  exports: [UserService],
 })
 export class UserModule {}

@@ -16,12 +16,6 @@ import { WsJwtGuard } from './gateway/ws-jwt/ws-jwt.guard';
     GatewayModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      provide: APP_GUARD,
-      useClass: WsJwtGuard,
-    },
-  ],
+  providers: [AppService],
 })
 export class AppModule {}

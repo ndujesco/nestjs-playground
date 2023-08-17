@@ -1,6 +1,5 @@
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import {
-  OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
   SubscribeMessage,
@@ -9,30 +8,26 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { MessageDto } from 'src/user/message.dto';
-import { UserService } from 'src/user/user.service';
 import { ServerToClientEvents } from './event.types';
+import { WsJwtGuard } from './ws-jwt/ws-jwt.guard';
+import { SocketAuthMiddleWare } from './ws.mw';
 
-@Injectable()
 @WebSocketGateway()
-export class ChatGateway
-  implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
-{
+@UseGuards(WsJwtGuard)
+export class ChatGateway implements OnGatewayDisconnect, OnGatewayInit {
   @WebSocketServer()
   server: Server<any, ServerToClientEvents>;
 
-  constructor(
-    @Inject(forwardRef(() => UserService)) private userService: UserService,
-  ) {}
-
   @SubscribeMessage('newMessage')
-  onNewMessage(client: Server, body: { roomName: string; message: string }) {
+  onNewMessage(client: Socket, body: { roomName: string; message: string }) {
     const { roomName, message } = body;
     const uniquifiedRoomName = roomName
       .split('-and-')
       .sort((a, b) => (a > b ? 1 : -1))
       .join('-and-');
+    console.log(client.rooms);
 
-    this.server.to(uniquifiedRoomName).emit('newMessage', { message });
+    this.server.to(uniquifiedRoomName).emit('onMessage', { message });
   }
 
   @SubscribeMessage('sample')
@@ -48,18 +43,12 @@ export class ChatGateway
       .sort((a, b) => (a > b ? 1 : -1))
       .join('-and-');
 
-    Array.from(client.rooms)
-      .filter((it) => it !== client.id)
-      .forEach((room) => {
-        client.leave(room);
-        client.removeAllListeners('newMessage');
-      });
     client.join(uniquifiedRoomName);
-    console.log(client.rooms);
   }
 
   async handleConnection(socket: Socket): Promise<void> {
     this.server.to(socket.id).emit('getId', socket.id);
+    console.log('Connected!');
   }
 
   async handleDisconnect(socket: Socket): Promise<void> {
@@ -67,6 +56,6 @@ export class ChatGateway
   }
 
   async afterInit(client: Socket) {
-    console.log('afterInit');
+    client.use(SocketAuthMiddleWare() as any);
   }
 }

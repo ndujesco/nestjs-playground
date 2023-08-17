@@ -8,6 +8,6 @@ interface Message {
   socketId: string;
 }
 export interface ServerToClientEvents {
-  newMessage: (payload: any) => void;
+  onMessage: (payload: any) => void;
   getId: (payload: any) => void;
 }

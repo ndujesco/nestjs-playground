@@ -14,7 +14,6 @@ export class UserService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly userRepository: UserRepository,
-    @Inject(forwardRef(() => ChatGateway))
     private chatGateWay: ChatGateway,
   ) {}
 
@@ -58,7 +57,7 @@ export class UserService {
     this.chatGateWay.server
       .to(uniquifiedRoomName)
       .except(socketId)
-      .emit('newMessage', { text });
+      .emit('onMessage', { text });
 
     return { text, uniquifiedRoomName };
   }
