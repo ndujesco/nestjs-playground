@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { GatewayModule } from './gateway/gateway.module';
 import { FilesModule } from './files/files.module';
+import { FileUploadModule } from './file_upload/file_upload.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { FilesModule } from './files/files.module';
     }),
     GatewayModule,
     FilesModule,
+    FileUploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

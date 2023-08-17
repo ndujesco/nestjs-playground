@@ -29,6 +29,7 @@ export class FilesController {
     }),
   )
   uploadFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
+    const url = this.filesService.uploadPicture(file);
+    return { message: true, url };
   }
 }
