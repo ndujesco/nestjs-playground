@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { FilesService } from './files.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+// import { memoryStorage } from 'multer';
 import { diskStorage } from 'multer';
 
 const storage = diskStorage({
@@ -16,6 +17,8 @@ const storage = diskStorage({
     cb(null, Date.now().toString() + '-' + file.originalname);
   },
 });
+
+// const storage = memoryStorage();
 
 @Controller('files')
 export class FilesController {
@@ -28,8 +31,8 @@ export class FilesController {
       storage,
     }),
   )
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    const url = this.filesService.uploadPicture(file);
-    return { message: true, url };
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    const response = await this.filesService.uploadPicture(file);
+    return { message: true, response };
   }
 }

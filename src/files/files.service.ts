@@ -1,12 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import FileUploadService from 'src/file_upload/file_upload.interface';
 
 @Injectable()
 export class FilesService {
   constructor(private readonly fileUploader: FileUploadService) {}
-  uploadPicture(file: Express.Multer.File) {
+  async uploadPicture(file: Express.Multer.File) {
     console.log(file);
+    return await this.fileUploader.uploadImage(file).catch((err) => {
+      console.log(err);
 
-    return this.fileUploader.uploadFile(file);
+      throw new BadRequestException('Invalid file type.');
+    });
   }
 }
