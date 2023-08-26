@@ -11,7 +11,7 @@ import { diskStorage } from 'multer';
 
 const storage = diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'src/images/uploads');
+    cb(null, 'images');
   },
   filename: (req, file, cb) => {
     cb(null, Date.now().toString() + '-' + file.originalname);
@@ -32,6 +32,9 @@ export class FilesController {
     }),
   )
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    console.log(file);
+
+    return;
     const response = await this.filesService.uploadPicture(file);
     return { message: true, response };
   }
