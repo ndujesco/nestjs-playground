@@ -18,6 +18,8 @@ export class WsJwtGuard implements CanActivate {
 
   static validateToken(client: Socket) {
     const { authorization } = client.handshake.headers;
+    console.log(client.handshake.query.penny);
+
     const token: string = authorization.split(' ')[1];
 
     const payload = verify(token, 'penny and dime.');
