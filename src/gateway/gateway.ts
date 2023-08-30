@@ -48,7 +48,6 @@ export class ChatGateway implements OnGatewayDisconnect, OnGatewayInit {
 
   async handleConnection(socket: Socket): Promise<void> {
     this.server.to(socket.id).emit('getId', socket.id);
-    console.log('Connected!');
   }
 
   async handleDisconnect(socket: Socket): Promise<void> {
